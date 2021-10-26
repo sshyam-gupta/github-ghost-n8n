@@ -11,6 +11,16 @@
       ]
     },
     {
+      "parameters": {},
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        650,
+        540
+      ],
+      "typeVersion": 1
+    },
+    {
       "parameters": {
         "conditions": {
           "string": [
@@ -26,7 +36,7 @@
         },
         "combineOperation": "any"
       },
-      "name": "IF",
+      "name": "IF is push event or PR is opened",
       "type": "n8n-nodes-base.if",
       "position": [
         443.5,
@@ -35,24 +45,27 @@
       "typeVersion": 1
     },
     {
-      "parameters": {},
-      "name": "NoOp",
-      "type": "n8n-nodes-base.noOp",
-      "position": [
-        643.5,
-        543.5
-      ],
-      "typeVersion": 1
-    },
-    {
-      "parameters": {},
-      "name": "NoOp1",
-      "type": "n8n-nodes-base.noOp",
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "createComment",
+        "owner": "sshyam-gupta",
+        "repository": "github-ghost-n8n",
+        "issueNumber": "={{$node[\"GitHub Trigger\"].json[\"body\"][\"pull_request\"][\"number\"]}}",
+        "body": "=Thanks, @{{$node[\"GitHub Trigger\"].json[\"body\"][\"issue\"][\"user\"][\"login\"]}} for opening this PR 🙂"
+      },
+      "name": "GitHub",
+      "type": "n8n-nodes-base.github",
       "typeVersion": 1,
       "position": [
-        650,
-        340
-      ]
+        660,
+        350
+      ],
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "4",
+          "name": "Github account"
+        }
+      }
     },
     {
       "parameters": {
@@ -81,11 +94,11 @@
     }
   ],
   "connections": {
-    "IF": {
+    "IF is push event or PR is opened": {
       "main": [
         [
           {
-            "node": "NoOp1",
+            "node": "GitHub",
             "type": "main",
             "index": 0
           }
@@ -103,7 +116,7 @@
       "main": [
         [
           {
-            "node": "IF",
+            "node": "IF is push event or PR is opened",
             "type": "main",
             "index": 0
           }
