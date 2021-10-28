@@ -30,4 +30,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-[ISC](LICENSE) © 2021 Shyam Gupta <shyamsundar.g@kiprosh.com>
+[ISC](LICENSE) © 2021 Shyam <shyamsundar.g@kiprosh.com>
