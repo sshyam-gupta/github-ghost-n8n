@@ -39,7 +39,7 @@ You can even change permissions in `getPermissions` util located in *`utils/role
 
 ## Working of `useHasPermissions` hook:
 
-![useHasPermissions-1](https://8e71-103-48-102-168.ngrok.io/content/images/2021/09/useHasPermissions-1.png)
+![useHasPermissions-1](https://unsplash.com/photos/yNvVnPcurD8)
 
 The main task of `useHasPermissions` hook is to verify and return the boolean flag if the currently logged-in user has the permission which the app needs. We can either pass permission as `string` or an `array of permissions`. 
 This hook gets the current user context with the help of `useUser` hook. And checks for the `permission/s` needed with the permissions from `usercontext`.
