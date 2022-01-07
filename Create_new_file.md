@@ -1,3 +1,4 @@
+Edited on 1:47pm 7th jan.
 React is a very popular and growing JavaScript library. When we think in the Context of MVC architecture, so React comprises of **View** in MVC architecture. For managing application state we may need to rely on other JavaScript state management libraries like **Redux** or if you are using React v16+, so you can use React's [Context API](https://reactjs.org/docs/context.html) in combination with [useReducer hook](https://reactjs.org/docs/hooks-reference.html#usereducer) to serve our state management purpose.
 
 > Good architecture makes the system easy to understand, easy to develop, easy to maintain, and easy to deploy. The ultimate goal is to minimize the lifetime cost of the system and to maximize programmer productivity. - Robert C. Martin
