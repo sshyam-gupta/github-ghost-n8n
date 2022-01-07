@@ -32,4 +32,4 @@ For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 [ISC](LICENSE) © 2021 Shyam <shyamsundar.g@kiprosh.com>
 
-On 7th Jan: 2pm
+On 7th Jan: 01:58pm
