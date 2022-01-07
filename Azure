@@ -1,0 +1,126 @@
+Are you planning to implement chat functionality in your app?
+Plenty of services are available, one of them is Azure Communication Service.
+Early 2021 Microsoft has released multiple APIs and SDKs under Azure Communication Service(ACS) 
+which supports various communication formats like chat, voice, and video calls, SMS messaging, etc.
+The SDKs for these services are available for a wide range of platforms and languages.
+
+Recently I worked with Azure Communication Services-Chat SDKs to add a real-time text chat feature to the Android application. This article mainly covers the code required for the Android chat app, the article on Azure Communication Service setup for Azure Portal will help you to create a communication resource. The communication resource will generate the connection string and endpoint, which are required in the client application to connect with ACS.
+
+Before diving deep into the Android code implementation, let me walk you through the important ingredients required for the chat app.
+
+## The Main Ingredients Of The Chat App:
+
+- **SDKName:** Azure chat SDK name i.e, azure-communication-com.azure.android.communication.chat
+- **SDKVersion:** The SDK version that you will be using
+- **ApplicationId:** Unique ID of your application, it can be any string.
+- **EndPoint:** Get it from the resource added in the Azure portal (resource -> key).
+- **UserAccessToken:** Token is required for the client application to authenticate and connect with ACS. (If you are yet to configure the backend APIs to get the token, you   can use Azure Communication UI to generate all required data to configure the chat application)
+
+## Setting Up The Andriod Chat App:
+Let's see how the ACS-Chat SDK helped me to build the feature quickly in six simple steps.
+
+### 1. Add dependency:
+Some mundane stuff, add ACS-Chat dependency in the build.gradle:
+```
+android {
+   ...
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/notice'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.md")
+        exclude("META-INF/*.txt")
+        exclude("META-INF/*.kotlin_module")
+    }
+}
+
+dependencies {
+	implementation 'com.azure.android:azure-communication-chat:1.1.0-beta.3'
+	implementation 'com.azure.android:azure-communication-common:1.0.1'
+}
+
+```
+
+### 2. Create ChatAsyncClient:
+`ChatAsyncClient` helps to create, get, delete chat threads, and subscribe to chat events. It requires applicationId, SDKName, SDKVersion, resourceUrl and userAccessToken to create an instance of ChatAsyncClient.
+```
+fun createChatAsyncClient() {
+        val chatAsyncClient: ChatAsyncClient = ChatClientBuilder()
+            .endpoint(resourceUrl)
+            .credential(CommunicationTokenCredential(token))
+            .addPolicy(UserAgentPolicy(applicationId, sdkName, sdkVersion))
+            .buildAsyncClient()
+    }
+```
+
+### 3. Get all messages:
+To get all incoming or outgoing messages, we need to enable the real-time notification and register the handler to get the trigger of a new message. ChatAsyncClient helps to subscribe to different chat events.
+```
+fun receiveChatMessages() {
+        chatAsyncClient!!.startRealtimeNotifications(token, context)
+        chatAsyncClient!!.addEventHandler(ChatEventType.CHAT_MESSAGE_RECEIVED) { payload: ChatEvent ->
+            val chatMessageReceivedEvent =
+                payload as ChatMessageReceivedEvent
+            if (!chatMessageReceivedEvent.senderDisplayName.trim { it <= ' ' }
+                    .equals(userDisplayName, ignoreCase = true)) {
+                val nameAndMessage =
+                    chatMessageReceivedEvent.senderDisplayName + ": " + chatMessageReceivedEvent.content
+            }
+        }
+    }
+```
+
+### 4. Create ChatThreadAsyncClient:
+`ChatThreadAsyncClient` helps to send, receive, update, delete messages, send typing notifications, and read receipts and add, remove, get users. It requires resourceUrl, threadId, and userAccessToken to create an instance.
+```
+fun createChatThreadAsyncClient() {
+        var chatThreadAsyncClient: ChatThreadAsyncClient = ChatThreadClientBuilder()
+            .endpoint(resourceUrl)
+            .credential(CommunicationTokenCredential(token))
+            .chatThreadId(threadId)
+            .buildAsyncClient()
+    }
+```
+
+### 5. Send a message:
+We will use the ChatThreadAsyncClient to send the message to the particular user. SendChatMessageOptions class provides the options to set content, link attachments, add a display name, etc.
+```
+fun sendMessage() {
+        val chatMessageOptions = SendChatMessageOptions()
+        options.type = ChatMessageType.TEXT
+        options.content = "messageString"
+        options.senderDisplayName = senderDisplayName
+        chatThreadAsyncClient!!.sendMessage(chatMessageOptions)
+    }
+```
+
+### 6. Get all messages of the particular thread:
+We can get the list of all messages present shared on the particular thread with the help of ChatThreadAsyncClient.
+```
+fun getAllMessagesOfTheThread() {
+        val messagePagedAsyncStream = chatThreadAsyncClient!!.listMessages(ListChatMessagesOptions(), null)
+
+        messagePagedAsyncStream.forEach(object : AsyncStreamHandler<ChatMessage> {
+            override fun onNext(message: ChatMessage) {
+                val data = message.senderDisplayName.toString() + ": " + message.content.message
+            }
+            override fun onError(throwable: Throwable) {}
+            override fun onComplete() {}
+        })
+    }
+```
+
+And we are done!
+
+Is that all Azure Communication Service-Chat SDK provides? No, the second part of this blog will talk about all the extended functionalities Chat SDK provides, including code to share attachments, update/delete chat messages, add/remove participants from the thread, group chatting, create/delete chat threads, send/receive read status, push notification support, etc.
+Stay tuned for more updates.
+
+I have pushed a demo chat app on Github. I hope this article and demo project is helpful.
+
+
+References:
+- Azure Communication Service SDKs and REST APIs
+- Azure Communication Service-Chat Documentation
